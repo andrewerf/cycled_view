@@ -16,11 +16,26 @@ class CycledView : public std::ranges::view_interface<CycledView<TRange>>
 public:
     CycledView() = default;
 
-    template <typename T>
-    explicit CycledView( T&& range ):
-        begin_( std::ranges::begin( range ) ),
-        end_( std::ranges::end( range ) )
+    explicit CycledView( TRange&& range ):
+        range_( std::forward<TRange>( range ) )
     {}
+
+    CycledView( CycledView&& other ) noexcept
+        requires std::is_reference_v<TRange>:
+        range_( other.range_ ) {}
+
+    CycledView( CycledView&& other ) noexcept:
+        range_( std::move( other.range_ ) ) {}
+
+    CycledView( const CycledView& other ):
+        range_( other.range_ ) {}
+
+    CycledView& operator=( CycledView&& other ) noexcept = default;
+    CycledView& operator=( CycledView&& other ) noexcept
+        requires std::is_reference_v<TRange>
+    {
+        range_ = other.range_;
+    }
 
     auto begin()
     {
@@ -31,7 +46,7 @@ public:
     { return {}; }
 
 private:
-    UnderlyingIterator begin_, end_;
+    TRange range_;
 
     struct Iterator {
         using iterator_traits = std::iterator_traits<UnderlyingIterator>;
@@ -48,7 +63,7 @@ private:
 
         Iterator( CycledView<TRange>* view ) noexcept:
             view_( view ),
-            current_( view_->begin_ )
+            current_( view_->range_.begin() )
         {}
 
         const reference operator*() const
@@ -79,8 +94,8 @@ private:
         Iterator& operator++()
             requires std::forward_iterator<UnderlyingIterator>
         {
-            if ( ++current_ == view_->end_ )
-                current_ = view_->begin_;
+            if ( ++current_ == view_->range_.end() )
+                current_ = view_->range_.begin();
 
             return *this;
         }
@@ -99,8 +114,8 @@ private:
         Iterator& operator--()
             requires std::bidirectional_iterator<UnderlyingIterator>
         {
-            if ( current_ == view_->begin_ )
-                current_ = std::prev( view_->end_ );
+            if ( current_ == view_->range_.begin() )
+                current_ = std::prev( view_->range_.end() );
 
             return *this;
         }
@@ -122,13 +137,13 @@ private:
             if ( n < 0 )
                 return *( this ) -= std::abs( n );
 
-            const auto size = std::distance( view_->begin_, view_->end_ );
-            const auto dist_to_end = std::distance( current_, view_->end_ );
+            const auto size = std::distance( view_->range_.begin(), view_->range_.end() );
+            const auto dist_to_end = std::distance( current_, view_->range_.end() );
 
             if ( n % size < dist_to_end )
                 current_ += n % size;
             else
-                current_ = view_->begin_ + ( n % size - dist_to_end );
+                current_ = view_->range_.begin() + ( n % size - dist_to_end );
 
             return *this;
         }
@@ -147,13 +162,13 @@ private:
             if ( n < 0 )
                 return *( this ) += std::abs( n );
 
-            const auto size = std::distance( view_->begin_, view_->end_ );
-            const auto dist_from_begin = std::distance( view_->begin_, current_ );
+            const auto size = std::distance( view_->range_.begin(), view_->range_.end() );
+            const auto dist_from_begin = std::distance( view_->range_.begin(), current_ );
 
             if ( n % size < dist_from_begin )
                 current_ -= n % size;
             else
-                current_ = view_->end_ - ( n % size - dist_from_begin );
+                current_ = view_->range_.end() - ( n % size - dist_from_begin );
 
             return *this;
         }
@@ -193,8 +208,8 @@ private:
         difference_type operator-( const Iterator& other ) const
             requires std::random_access_iterator<UnderlyingIterator>
         {
-            return std::min( std::ranges::distance( view_->begin_, current_ ),
-                             std::ranges::distance( current_, view_->end_ ) );
+            return std::min( std::ranges::distance( view_->range_.begin(), current_ ),
+                             std::ranges::distance( current_, view_->range_.end() ) );
         }
         // random access iterator
 
@@ -206,8 +221,8 @@ private:
 };
 
 
-template <typename T>
-CycledView( T&& range ) -> CycledView<std::remove_reference_t<T>>;
+template <std::ranges::forward_range T>
+CycledView( T&& ) -> CycledView<T>;
 
 struct CycledViewFn
 {
