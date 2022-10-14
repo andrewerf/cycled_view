@@ -45,6 +45,7 @@ TEST( CycledViewTest, ForwardIterator )
     static_assert( !std::ranges::bidirectional_range<decltype( cycledView )> );
     static_assert( !std::ranges::random_access_range<decltype( cycledView )> );
     static_assert( !std::ranges::contiguous_range<decltype( cycledView )> );
+    static_assert( !std::ranges::sized_range<decltype( cycledView )> );
 }
 
 TEST( CycledViewTest, BidirectionalIterator )
@@ -57,6 +58,7 @@ TEST( CycledViewTest, BidirectionalIterator )
     static_assert( std::ranges::bidirectional_range<decltype( cycledView )> );
     static_assert( !std::ranges::random_access_range<decltype( cycledView )> );
     static_assert( !std::ranges::contiguous_range<decltype( cycledView )> );
+    static_assert( !std::ranges::sized_range<decltype( cycledView )> );
 }
 
 TEST( CycledViewTest, RandomAccessIterator )
@@ -69,6 +71,7 @@ TEST( CycledViewTest, RandomAccessIterator )
     static_assert( std::ranges::bidirectional_range<decltype( cycledView )> );
     static_assert( std::ranges::random_access_range<decltype( cycledView )> );
     static_assert( !std::ranges::contiguous_range<decltype( cycledView )> );
+    static_assert( !std::ranges::sized_range<decltype( cycledView )> );
 }
 
 TEST( CycledViewTest, PerfectForwarding )
