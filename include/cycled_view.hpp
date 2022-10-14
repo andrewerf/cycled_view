@@ -116,6 +116,8 @@ private:
         {
             if ( current_ == view_->range_.begin() )
                 current_ = std::prev( view_->range_.end() );
+            else
+                current_ = std::prev( current_ );
 
             return *this;
         }
@@ -165,7 +167,7 @@ private:
             const auto size = std::distance( view_->range_.begin(), view_->range_.end() );
             const auto dist_from_begin = std::distance( view_->range_.begin(), current_ );
 
-            if ( n % size < dist_from_begin )
+            if ( n % size <= dist_from_begin )
                 current_ -= n % size;
             else
                 current_ = view_->range_.end() - ( n % size - dist_from_begin );

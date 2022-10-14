@@ -111,3 +111,31 @@ TEST( CycledViewTest, CyclingLogic )
         ASSERT_EQ( rng[6], 1 );
     }
 }
+
+TEST( CycledViewTest, MinusOperator )
+{
+    const std::vector<int> vec{ 1, 2, 3 };
+    const std::vector<int> expected{ 1, 3, 2, 1, 3, 2, 1, 3, 2, 1 };
+    auto rng = vec | cycle;
+
+    {
+        std::vector<int> res;
+        size_t i = 0;
+        for ( auto it = rng.begin() + 6; i <= 9; --it, ++i )
+            res.push_back( *it );
+        ASSERT_EQ( res, expected );
+    }
+
+    {
+        auto it = rng.begin() + 6;
+        ASSERT_EQ( *it, 1 );
+        ASSERT_EQ( *( it - 1 ), 3 );
+        ASSERT_EQ( *( it - 2 ), 2 );
+        ASSERT_EQ( *( it - 3 ), 1 );
+        ASSERT_EQ( *( it - 4 ), 3 );
+        ASSERT_EQ( *( it - 5 ), 2 );
+        ASSERT_EQ( *( it - 6 ), 1 );
+        ASSERT_EQ( *( it - 7 ), 3 );
+        ASSERT_EQ( *( it - 8 ), 2 );
+    }
+}
