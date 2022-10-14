@@ -87,18 +87,18 @@ TEST( CycledViewTest, PerfectForwarding )
 
 TEST( CycledViewTest, CyclingLogic )
 {
-    const std::vector<int> vec{ 1, 2, 3 };
+    const std::vector<int> vec{ 1, 2, 3, 4 };
 
     {
         const std::list<int> res{ 1, 2, 3, 1, 2, 3, 1, 2 };
-        auto rng = vec | cycle | std::views::take( 8 );
+        auto rng = vec | std::views::take( 3 ) | cycle | std::views::take( 8 );
         std::list<int> resCycled;
         std::ranges::copy( rng, std::back_inserter( resCycled ) );
         ASSERT_EQ( res, resCycled );
     }
 
     {
-        auto rng = vec | cycle;
+        auto rng = vec | std::views::take( 3 ) | cycle;
         ASSERT_EQ( rng[0], 1 );
         ASSERT_EQ( rng[1], 2 );
         ASSERT_EQ( rng[2], 3 );
