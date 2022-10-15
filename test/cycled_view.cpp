@@ -25,7 +25,6 @@ TEST( CycledViewTest, NonConstAccess )
     std::forward_list<int> res{ 2, 3, 4 };
     CycledView cycledView( list );
 
-    static_assert( std::same_as<decltype( cycledView ), CycledView<std::forward_list<int>&>> );
     auto listIt = list.begin();
     for ( auto it = cycledView.begin(); listIt != list.end(); ++it, ++listIt )
     {
@@ -40,7 +39,6 @@ TEST( CycledViewTest, ForwardIterator )
     const std::forward_list<int> list{ 1, 2, 3 };
     CycledView cycledView( list );
 
-    static_assert( std::same_as<decltype( cycledView ), CycledView<const std::forward_list<int>&>> );
     static_assert( std::ranges::forward_range<decltype( cycledView )> );
     static_assert( !std::ranges::bidirectional_range<decltype( cycledView )> );
     static_assert( !std::ranges::random_access_range<decltype( cycledView )> );
@@ -53,7 +51,6 @@ TEST( CycledViewTest, BidirectionalIterator )
     const std::list<int> list{ 1, 2, 3 };
     CycledView cycledView( list );
 
-    static_assert( std::same_as<decltype( cycledView ), CycledView<const std::list<int>&>> );
     static_assert( std::ranges::forward_range<decltype( cycledView )> );
     static_assert( std::ranges::bidirectional_range<decltype( cycledView )> );
     static_assert( !std::ranges::random_access_range<decltype( cycledView )> );
@@ -66,7 +63,6 @@ TEST( CycledViewTest, RandomAccessIterator )
     const std::vector<int> vec{ 1, 2, 3 };
     CycledView cycledView( vec );
 
-    static_assert( std::same_as<decltype( cycledView ), CycledView<const std::vector<int>&>> );
     static_assert( std::ranges::forward_range<decltype( cycledView )> );
     static_assert( std::ranges::bidirectional_range<decltype( cycledView )> );
     static_assert( std::ranges::random_access_range<decltype( cycledView )> );
@@ -78,7 +74,6 @@ TEST( CycledViewTest, PerfectForwarding )
 {
     CycledView cycledView( std::vector{ 1, 2, 3 } );
 
-    static_assert( std::same_as<decltype( cycledView ), CycledView<std::vector<int>>> );
     ASSERT_EQ( cycledView[0], 1 );
     ASSERT_EQ( cycledView[1], 2 );
     ASSERT_EQ( cycledView[2], 3 );

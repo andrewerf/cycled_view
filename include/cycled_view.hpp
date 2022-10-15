@@ -20,23 +20,6 @@ public:
         range_( std::forward<TRange>( range ) )
     {}
 
-    CycledView( CycledView&& other ) noexcept
-        requires std::is_reference_v<TRange>:
-        range_( other.range_ ) {}
-
-    CycledView( CycledView&& other ) noexcept:
-        range_( std::move( other.range_ ) ) {}
-
-    CycledView( const CycledView& other ):
-        range_( other.range_ ) {}
-
-    CycledView& operator=( CycledView&& other ) noexcept = default;
-    CycledView& operator=( CycledView&& other ) noexcept
-        requires std::is_reference_v<TRange>
-    {
-        range_ = other.range_;
-    }
-
     auto begin()
     {
         return Iterator( this );
@@ -224,17 +207,17 @@ private:
 
 
 template <std::ranges::forward_range T>
-CycledView( T&& ) -> CycledView<T>;
+CycledView( T&& ) -> CycledView<std::views::all_t<T>>;
 
 struct CycledViewFn
 {
-    template <std::ranges::input_range TRange>
+    template <std::ranges::forward_range TRange>
     auto operator()( TRange&& range ) const
     {
         return CycledView( std::forward<TRange>( range ) );
     }
 
-    template <std::ranges::input_range TRange>
+    template <std::ranges::forward_range TRange>
     friend auto operator| ( TRange&& range, const CycledViewFn& cycledViewFn )
     {
         return CycledView( std::forward<TRange>( range ) );
