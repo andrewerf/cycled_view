@@ -134,3 +134,19 @@ TEST( CycledViewTest, MinusOperator )
         ASSERT_EQ( *( it - 8 ), 2 );
     }
 }
+
+TEST( CycledViewTest, Distance )
+{
+    const std::vector<int> vec{1, 2, 3};
+    auto rng = vec | cycle;
+
+    ASSERT_EQ( std::ranges::distance( rng.begin(), rng.begin() + 0 ), 0 );
+    ASSERT_EQ( std::ranges::distance( rng.begin(), rng.begin() + 1 ), 1 );
+    ASSERT_EQ( std::ranges::distance( rng.begin(), rng.begin() + 2 ), 2 );
+    ASSERT_EQ( std::ranges::distance( rng.begin(), rng.begin() + 3 ), 0 );
+
+    ASSERT_EQ( std::ranges::distance( rng.begin(), rng.begin() - 0 ), 0 );
+    ASSERT_EQ( std::ranges::distance( rng.begin(), rng.begin() - 1 ), 2 );
+    ASSERT_EQ( std::ranges::distance( rng.begin(), rng.begin() - 2 ), 1 );
+    ASSERT_EQ( std::ranges::distance( rng.begin(), rng.begin() - 3 ), 0 );
+}

@@ -141,6 +141,12 @@ private:
             return other;
         }
 
+        // We should consider this as the subtraction in Z/nZ ring
+        // where n is the size of the range.
+        // For instance (let n = 10): 4 is the inverse for 6 (since 4 + 6 = 0 (mod 10)),
+        // so:
+        // 5 - 4 == 5 + 6 == 1
+        // 2 - 4 == 2 + 6 == 8
         Iterator& operator-=( difference_type n )
             requires std::random_access_iterator<UnderlyingIterator>
         {
@@ -193,8 +199,7 @@ private:
         difference_type operator-( const Iterator& other ) const
             requires std::random_access_iterator<UnderlyingIterator>
         {
-            return std::min( std::ranges::distance( view_->range_.begin(), current_ ),
-                             std::ranges::distance( current_, view_->range_.end() ) );
+            return current_ - other.current_;
         }
         // random access iterator
 
